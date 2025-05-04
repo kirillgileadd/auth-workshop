@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package tasks;
+
+service TasksService {
+  rpc GetTasks (GetTaskRequest) returns (GetTasksResponse);
+}
+
+message GetTaskRequest {}
+
+message GetTasksResponse {
+  repeated Task tasks = 1;
+}
+
+message Task {
+  int64 id = 1;
+  string title = 2;
+  bool completed = 3;
+  int64 userId = 4;
+  User user  = 5;
+  string createdAt = 6;
+}
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  repeated Task tasks = 3;
+}

@@ -1,0 +1,19 @@
+
+¬
+tasks.prototasks"
+GetTaskRequest"5
+GetTasksResponse!
+tasks (2.tasks.TaskRtasks"¡
+Task
+id (Rid
+title (	Rtitle
+	completed (R	completed
+userId (RuserId
+user (2.tasks.UserRuser
+	createdAt (	R	createdAt"U
+User
+id (Rid
+username (	Rusername!
+tasks (2.tasks.TaskRtasks2J
+TasksService:
+GetTasks.tasks.GetTaskRequest.tasks.GetTasksResponsebproto3
