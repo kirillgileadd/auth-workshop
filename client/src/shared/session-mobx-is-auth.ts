@@ -1,6 +1,6 @@
-import { makeAutoObservable } from "mobx";
+import { autorun, makeAutoObservable } from "mobx";
 import { parseJwt } from "@/shared/lib/jwt.ts";
-import { BroadcastEvents } from "@/shared/lib/boardcast-events.ts";
+import { useEffect } from "react";
 
 type Session = {
   userId: number;
@@ -11,13 +11,6 @@ const TOKEN_KEY = "token";
 
 class SessionStore {
   token: string | null = localStorage.getItem(TOKEN_KEY);
-  updateSessionSteam = new BroadcastEvents<
-    | {
-        type: "update";
-        token: string;
-      }
-    | { type: "remove" }
-  >(TOKEN_KEY);
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
@@ -34,18 +27,25 @@ class SessionStore {
   setSessionToken(token: string) {
     localStorage.setItem(TOKEN_KEY, token);
     this.token = token;
-    this.updateSessionSteam.emit({ type: "update", token });
   }
 
   removeSession() {
     localStorage.removeItem(TOKEN_KEY);
     this.token = null;
-    this.updateSessionSteam.emit({ type: "remove" });
   }
 
   isSessionExpired() {
     const session = this.getSession();
     return !session || Date.now() > session.exp * 1000;
+  }
+
+  useToken(callback: (token: string | null) => void) {
+    useEffect(() => {
+      const dispose = autorun(() => {
+        callback(this.token);
+      });
+      return () => dispose();
+    }, []);
   }
 }
 

@@ -28,6 +28,7 @@ class SessionStore {
   }
 
   removeSession() {
+    console.log("rm session");
     localStorage.removeItem(TOKEN_KEY);
     this.updateSessionSteam.emit({ type: "remove" });
   }

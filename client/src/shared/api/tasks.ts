@@ -14,27 +14,20 @@ export const getTasks = async (): Promise<Task[]> => {
 };
 
 export const createTask = async (title: string): Promise<Task> => {
-  return authorizedApiClient<Task>({
-    url: "/tasks",
-    method: "POST",
-    json: { title },
-  });
+  const response = await authorizedApiClient.post<Task>("/tasks", { title });
+  return response.data;
 };
 
 export const deleteTask = async (id: number): Promise<void> => {
-  return authorizedApiClient({
-    url: `/tasks/${id}`,
-    method: "DELETE",
-  });
+  return authorizedApiClient.delete(`/tasks/${id}`);
 };
 
 export const toggleTask = async (
   id: number,
   completed: boolean,
 ): Promise<Task> => {
-  return authorizedApiClient<Task>({
-    url: `/tasks/${id}`,
-    method: "PATCH",
-    json: { completed },
+  const response = await authorizedApiClient.patch<Task>(`/tasks/${id}`, {
+    completed,
   });
+  return response.data;
 };

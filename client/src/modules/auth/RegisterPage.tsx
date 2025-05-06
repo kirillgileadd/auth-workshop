@@ -1,16 +1,24 @@
 import { useState } from "react";
 import { register } from "../../shared/api/auth";
-// import { appSessionStore } from "@/shared/session.ts";
-// import { useNavigate } from "react-router-dom";
+// import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
+// import {appSessionStore} from "@/shared/session-mobx.ts";
+import { appSessionStore } from "@/shared/session.ts";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // appSessionStore.updateSessionSteam.useEvent((event) => {
-  //   if (event.type === "update") {
+  appSessionStore.updateSessionSteam.useEvent((event) => {
+    if (event.type === "update") {
+      navigate("/tasks");
+    }
+  });
+
+  // appSessionStore.useToken((token) => {
+  //   if (token) {
   //     navigate("/tasks");
   //   }
   // });

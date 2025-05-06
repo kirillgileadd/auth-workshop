@@ -1,5 +1,6 @@
 import { createApi } from "../lib/create-api";
-import { appSessionStore } from "../session-mobx";
+// import { appSessionStore } from "../session-mobx";
+import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
 
 export const publicApiClient = createApi({
   baseUrl: "/api",

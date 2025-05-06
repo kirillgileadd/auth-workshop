@@ -1,22 +1,17 @@
-import { useRouter } from "next/navigation";
 import { retryMiddleware } from "nice-grpc-client-middleware-retry";
 import { Client, createChannel, createClientFactory } from "nice-grpc-web";
-import { PropsWithChildren } from "react";
-import { useMemo } from "use-memo-one";
+import { PropsWithChildren, useMemo } from "react";
 
-import { ROUTES } from "@/shared/router";
 import { AuthMiddleware } from "./auth-middleware.ts";
 import { GrpcClientsContextValue, grpcClientsContext } from "./context";
 import { errorMiddleware } from "./error-middleware.ts";
 import { loggerMiddleware } from "./logger-middleware.ts";
-import { TokenService } from "../lib";
 
 const channel = createChannel(
   process.env.NEXT_PUBLIC_API_URL ?? "https://dev.api-tips.api.quckoo.net",
 );
 
 export const GrpcClientsProvider = ({ children }: PropsWithChildren) => {
-  const router = useRouter();
   const value = useMemo((): GrpcClientsContextValue => {
     let clientFactory = createClientFactory()
       .use(loggerMiddleware)

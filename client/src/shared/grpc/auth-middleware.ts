@@ -1,6 +1,4 @@
 import { ClientError, ClientMiddleware, Metadata, Status } from "nice-grpc-web";
-import toast from "react-hot-toast";
-import { TokenService } from "@/shared/lib";
 
 export type AuthMiddlewareParams = {
   getAccessToken: (signal?: AbortSignal) => string | undefined;
@@ -34,7 +32,6 @@ export function AuthMiddleware({
         const { newAccessToken } =
           await TokenService.refreshToken(onRefreshFail);
 
-        toast.error(error.message);
         const newMetadata = Metadata(options.metadata).set(
           "Authorization",
           `Bearer ${newAccessToken}`,

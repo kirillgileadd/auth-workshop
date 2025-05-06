@@ -3,7 +3,9 @@ import LoginPage from "../modules/auth/LoginPage";
 import RegisterPage from "../modules/auth/RegisterPage";
 import TaskList from "../modules/tasks/TaskList";
 import { App } from "./app";
-import { appSessionStore } from "@/shared/session-mobx.ts";
+// import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
+import { appSessionStore } from "@/shared/session.ts";
+// import { reaction } from "mobx";
 
 export const router = createBrowserRouter([
   {
@@ -32,16 +34,36 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/register",
-        element: <RegisterPage />,
+        loader: () => {
+          if (appSessionStore.getSessionToken()) {
+            return redirect("/tasks");
+          }
+          return null;
+        },
+        children: [
+          {
+            path: "/login",
+            element: <LoginPage />,
+          },
+          {
+            path: "/register",
+            element: <RegisterPage />,
+          },
+        ],
       },
     ],
   },
 ]);
+
+// reaction(
+//   () => appSessionStore.token,
+//   (newToken, prevToken) => {
+//     console.log(newToken, prevToken, "np tok");
+//     if (!newToken && prevToken) {
+//       router.navigate("/login");
+//     }
+//   },
+// );
 
 appSessionStore.updateSessionSteam.listen((event) => {
   if (event.type === "remove") {

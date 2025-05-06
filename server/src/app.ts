@@ -173,7 +173,7 @@ app.post("/api/refresh", async (req, res) => {
     });
 
     if (!storedToken || storedToken.expiresAt < new Date()) {
-      res.status(403).json({ error: "Invalid refresh token" });
+      res.status(401).json({ error: "Invalid refresh token" });
       return;
     }
 

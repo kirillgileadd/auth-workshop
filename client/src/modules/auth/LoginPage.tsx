@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { login } from "@/shared/api/auth";
 import { useNavigate } from "react-router-dom";
-// import { appSessionStore } from "@/shared/session.ts";
-import { appSessionStore } from "@/shared/session-mobx.ts";
+import { appSessionStore } from "@/shared/session.ts";
+// import { appSessionStore } from "@/shared/session-mobx.ts";
+// import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
 import { observer } from "mobx-react-lite";
 
 function LoginPage() {
@@ -10,6 +11,12 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // appSessionStore.useToken((token) => {
+  //   if (token) {
+  //     navigate("/tasks");
+  //   }
+  // });
 
   appSessionStore.updateSessionSteam.useEvent((event) => {
     if (event.type === "update") {

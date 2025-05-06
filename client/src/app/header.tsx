@@ -1,12 +1,14 @@
 import { logout } from "@/shared/api/auth";
 import { useTransition } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { appSessionStore } from "@/shared/session-mobx";
+// import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
+import { appSessionStore } from "@/shared/session.ts";
 
 export function Header() {
   const navigate = useNavigate();
   // const session = appSessionStore.useSession();
   const session = appSessionStore.getSession();
+  // const token = appSessionStore.token;
 
   const [isTransitioning, startTransition] = useTransition();
 

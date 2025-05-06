@@ -1,5 +1,6 @@
 import { publicApiClient } from "./client-axios.ts";
 import { appSessionStore } from "@/shared/session-mobx.ts";
+// import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
 
 export interface User {
   username: string;
