@@ -2,7 +2,7 @@ import { useState } from "react";
 import { register } from "../../shared/api/auth";
 // import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
 // import {appSessionStore} from "@/shared/session-mobx.ts";
-import { appSessionStore } from "@/shared/session.ts";
+import { appSessionStore } from "@/shared/session-mobx.ts";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
@@ -11,17 +11,17 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  appSessionStore.updateSessionSteam.useEvent((event) => {
-    if (event.type === "update") {
-      navigate("/tasks");
-    }
-  });
-
-  // appSessionStore.useToken((token) => {
-  //   if (token) {
+  // appSessionStore.updateSessionSteam.useEvent((event) => {
+  //   if (event.type === "update") {
   //     navigate("/tasks");
   //   }
   // });
+
+  appSessionStore.useToken((event) => {
+    if (event?.type === "update") {
+      navigate("/tasks");
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

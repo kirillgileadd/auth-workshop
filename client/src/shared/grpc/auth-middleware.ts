@@ -1,54 +1,85 @@
-import { ClientError, ClientMiddleware, Metadata, Status } from "nice-grpc-web";
+import {
+  CallOptions,
+  ClientError,
+  ClientMiddlewareCall,
+  Metadata,
+  Status,
+} from "nice-grpc-web";
+import { appSessionStore } from "@/shared/session-mobx.ts";
+import { publicApiClient } from "@/shared/api/client-axios.ts";
 
-export type AuthMiddlewareParams = {
-  getAccessToken: (signal?: AbortSignal) => string | undefined;
-  onRefreshFail: () => void;
+let refreshPromise: Promise<string | null> | null = null;
+
+const getRefreshToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const result = await publicApiClient.post<{ token: string }>(
+          "/refresh",
+        );
+        appSessionStore.setSessionToken(result.data.token);
+        return result.data.token;
+      } catch (error) {
+        appSessionStore.removeSession();
+        return null;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+  }
+
+  return refreshPromise;
 };
 
-export function AuthMiddleware({
-  getAccessToken,
-  onRefreshFail,
-}: AuthMiddlewareParams): ClientMiddleware {
-  return async function* authMiddleware(call, options) {
-    const token = getAccessToken(options.signal);
+export async function* authMiddleware<Request, Response>(
+  call: ClientMiddlewareCall<Request, Response>,
+  options: CallOptions,
+) {
+  let refreshed = false;
+  let token = appSessionStore.getSessionToken();
 
-    const metadata = Metadata(options.metadata).set(
-      "Authorization",
-      `Bearer ${token}`,
-    );
-    try {
-      const response = yield* call.next(call.request, {
-        ...options,
-        metadata,
-      });
+  if (!token || appSessionStore.isSessionExpired()) {
+    token = await getRefreshToken();
+    refreshed = true;
+  }
 
-      return response;
-    } catch (error) {
-      if (
-        error instanceof ClientError &&
-        error.code === Status.UNAUTHENTICATED
-      ) {
-        // Здесь логика обновления токена
-        const { newAccessToken } =
-          await TokenService.refreshToken(onRefreshFail);
+  const metadata = Metadata(options.metadata).set(
+    "Authorization",
+    `Bearer ${token}`,
+  );
 
+  try {
+    const response = yield* call.next(call.request, {
+      ...options,
+      metadata,
+    });
+
+    return response;
+  } catch (error) {
+    if (
+      error instanceof ClientError &&
+      error.code === Status.UNAUTHENTICATED &&
+      !refreshed
+    ) {
+      const newToken = await getRefreshToken();
+      if (newToken) {
         const newMetadata = Metadata(options.metadata).set(
           "Authorization",
-          `Bearer ${newAccessToken}`,
+          `Bearer ${newToken}`,
         );
-        // Повторяем запрос с обновленным токеном
         const response = yield* call.next(call.request, {
           ...options,
           metadata: newMetadata,
         });
         return response;
       }
-      if (error instanceof ClientError) {
-        // toast.error(error.details);
-        throw error;
-      } else {
-        throw error;
-      }
+      appSessionStore.removeSession();
     }
-  };
+
+    if (error instanceof ClientError) {
+      throw error;
+    } else {
+      throw error;
+    }
+  }
 }

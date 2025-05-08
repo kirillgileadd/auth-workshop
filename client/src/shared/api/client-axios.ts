@@ -1,6 +1,6 @@
 import axios from "axios";
 // import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
-import { appSessionStore } from "@/shared/session.ts";
+import { appSessionStore } from "@/shared/session-mobx.ts";
 
 let refreshPromise: Promise<string | null> | null = null;
 
@@ -26,11 +26,13 @@ const getRefreshToken = async () => {
 };
 
 export const publicApiClient = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_ENVOY_API_URL + "/api",
+  withCredentials: true,
 });
 
 export const authorizedApiClient = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_ENVOY_API_URL + "/api",
+  withCredentials: true,
 });
 
 authorizedApiClient.interceptors.request.use(async (config) => {

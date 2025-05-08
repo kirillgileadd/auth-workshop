@@ -1,6 +1,6 @@
-import { ApiTipsAccessServiceDefinition } from "@/shared/proto/api_tips_access/v1/api_tips_access";
-import { useGrpcClient } from "../useGrpcClient";
+import { useGrpcClient } from "../use-grpc-client.ts";
+import { TasksServiceDefinition } from "@/shared/proto/tasks.ts";
 
-export const useAccessClient = () => {
-  return useGrpcClient(ApiTipsAccessServiceDefinition);
+export const useTasksClient = () => {
+  return useGrpcClient(TasksServiceDefinition);
 };

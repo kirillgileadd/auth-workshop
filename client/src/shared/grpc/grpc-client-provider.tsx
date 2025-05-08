@@ -2,29 +2,17 @@ import { retryMiddleware } from "nice-grpc-client-middleware-retry";
 import { Client, createChannel, createClientFactory } from "nice-grpc-web";
 import { PropsWithChildren, useMemo } from "react";
 
-import { AuthMiddleware } from "./auth-middleware.ts";
 import { GrpcClientsContextValue, grpcClientsContext } from "./context";
 import { errorMiddleware } from "./error-middleware.ts";
-import { loggerMiddleware } from "./logger-middleware.ts";
+import { authMiddleware } from "@/shared/grpc/auth-middleware.ts";
 
-const channel = createChannel(
-  process.env.NEXT_PUBLIC_API_URL ?? "https://dev.api-tips.api.quckoo.net",
-);
+const channel = createChannel("http://localhost:8086");
 
 export const GrpcClientsProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo((): GrpcClientsContextValue => {
-    let clientFactory = createClientFactory()
-      .use(loggerMiddleware)
-      .use(retryMiddleware);
+    let clientFactory = createClientFactory().use(retryMiddleware);
 
-    clientFactory = clientFactory
-      .use(
-        AuthMiddleware({
-          getAccessToken: TokenService.getAccessToken,
-          onRefreshFail: () => router.push(ROUTES.HOME),
-        }),
-      )
-      .use(errorMiddleware);
+    clientFactory = clientFactory.use(authMiddleware).use(errorMiddleware);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clients = new Map<object, Client<any>>();

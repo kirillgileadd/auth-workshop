@@ -15,10 +15,11 @@ const ACCESS_TOKEN_EXPIRY = 60; // 15 minutes
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: "http://localhost:5173",
     credentials: true,
-  })
+  }),
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -38,7 +39,7 @@ declare global {
 const authenticateToken = async (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -65,7 +66,7 @@ const authenticateToken = async (
 const createTokens = async (userId: number, username: string) => {
   const accessToken = jwt.createAccessToken(
     { userId, username } satisfies Session,
-    ACCESS_TOKEN_EXPIRY
+    ACCESS_TOKEN_EXPIRY,
   );
   const refreshToken = jwt.createRefreshToken();
 
@@ -80,6 +81,10 @@ const createTokens = async (userId: number, username: string) => {
 
   return { accessToken, refreshToken };
 };
+
+app.get("/", (req, res) => {
+  res.send("Hello from port 3000!");
+});
 
 // Auth routes
 app.post("/api/register", async (req, res) => {
@@ -105,7 +110,7 @@ app.post("/api/register", async (req, res) => {
 
     const { accessToken, refreshToken } = await createTokens(
       user.id,
-      user.username
+      user.username,
     );
 
     res.cookie("refreshToken", refreshToken, {
@@ -142,7 +147,7 @@ app.post("/api/login", async (req, res) => {
 
     const { accessToken, refreshToken } = await createTokens(
       user.id,
-      user.username
+      user.username,
     );
 
     res.cookie("refreshToken", refreshToken, {
@@ -185,7 +190,7 @@ app.post("/api/refresh", async (req, res) => {
     // Create new tokens
     const { accessToken, refreshToken: newRefreshToken } = await createTokens(
       storedToken.user.id,
-      storedToken.user.username
+      storedToken.user.username,
     );
 
     res.cookie("refreshToken", newRefreshToken, {
@@ -292,6 +297,6 @@ app.patch("/api/tasks/:id", authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("Server started on port 3000");
 });
