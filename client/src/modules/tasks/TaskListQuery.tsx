@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function TaskListQuery() {
   const { getTasks } = useTasksClient();
+
   const tasksQuery = useQuery({
     queryFn: async ({ signal }) => {
       const res = getTasks(signal);

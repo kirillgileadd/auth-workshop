@@ -50,7 +50,7 @@ class SessionStore {
   useToken(callback: (event: SessionEvent | null) => void) {
     useEffect(() => {
       const dispose = reaction(
-        () => appSessionStore.updateSessionSteam.lastEvent,
+        () => this.updateSessionSteam.lastEvent,
         (newEvent) => {
           callback(newEvent);
         },

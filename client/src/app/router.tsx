@@ -1,7 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import LoginPage from "../modules/auth/LoginPage";
 import RegisterPage from "../modules/auth/RegisterPage";
-import TaskList from "../modules/tasks/TaskListQuery";
+import TaskList from "../modules/tasks/TaskList";
 import { App } from "./app";
 // import { appSessionStore } from "@/shared/session-mobx-is-auth.ts";
 import { appSessionStore } from "@/shared/session-mobx.ts";
